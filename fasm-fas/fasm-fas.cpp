@@ -42,11 +42,7 @@ void _tmain( int argc, TCHAR *argv[] )
 	// Setup the child process.
 	ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
 	ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
-	siStartInfo.cb = sizeof(STARTUPINFO); 
-	siStartInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-	siStartInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	siStartInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+	siStartInfo.cb = sizeof(STARTUPINFO);
 
 	// Start the child process. 
 	if( !CreateProcess( prModuleName,   // Module name
