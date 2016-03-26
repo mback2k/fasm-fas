@@ -10,7 +10,7 @@
 #define MAX_CMD	8192
 #endif
 
-void _tmain( int argc, TCHAR *argv[] )
+int _tmain( int argc, TCHAR *argv[] )
 {
 	TCHAR prCommandLine[MAX_CMD+1] = {'\0'};
 	TCHAR prModuleName[MAX_PATH+1] = {'\0'};
@@ -21,12 +21,14 @@ void _tmain( int argc, TCHAR *argv[] )
 	// Setup the module name.
 	ZeroMemory(prModuleName, sizeof(prModuleName));
 	if (!GetModuleFileName(NULL, prModuleName, MAX_PATH)) {
-		fprintf(stderr, "GetModuleFileName failed (%d).\n", GetLastError());
-		return;
+		lpExitCode = GetLastError();
+		fprintf(stderr, "GetModuleFileName failed (%d).\n", lpExitCode);
+		return lpExitCode;
 	}
 	if (!PathRemoveFileSpec(prModuleName)) {
-		fprintf(stderr, "PathRemoveFileSpec failed (%d).\n", GetLastError());
-		return;
+		lpExitCode = GetLastError();
+		fprintf(stderr, "PathRemoveFileSpec failed (%d).\n", lpExitCode);
+		return lpExitCode;
 	}
 	StringCchCat(prModuleName, MAX_PATH, L"\\FAsm2.exe");
 	
@@ -56,8 +58,9 @@ void _tmain( int argc, TCHAR *argv[] )
 		&siStartInfo,   // Pointer to STARTUPINFO structure
 		&piProcInfo)    // Pointer to PROCESS_INFORMATION structure
 	) {
-		fprintf(stderr, "CreateProcess failed (%d).\n", GetLastError());
-		return;
+		lpExitCode = GetLastError();
+		fprintf(stderr, "CreateProcess failed (%d).\n", lpExitCode);
+		return lpExitCode;
 	}
 
 	// Wait until child process exits.
@@ -65,8 +68,9 @@ void _tmain( int argc, TCHAR *argv[] )
 
 	// Get the exit code of child process.
 	if (!GetExitCodeProcess(piProcInfo.hProcess, &lpExitCode)) {
-		fprintf(stderr, "GetExitCodeProcess failed (%d).\n", GetLastError());
-		return;
+		lpExitCode = GetLastError();
+		fprintf(stderr, "GetExitCodeProcess failed (%d).\n", lpExitCode);
+		return lpExitCode;
 	}
 
 	// Close process and thread handles. 
@@ -78,6 +82,6 @@ void _tmain( int argc, TCHAR *argv[] )
 	CopyFile(L"PureBasic.fas", L"..\\PureBasic.fas", FALSE);
 	CopyFile(L"PureBasic.obj", L"..\\PureBasic.obj", FALSE);
 
-	// Exit this process.
-	ExitProcess(lpExitCode);
+	// Return child process exit code.
+	return lpExitCode;
 }
