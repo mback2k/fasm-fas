@@ -19,33 +19,33 @@ void _tmain( int argc, TCHAR *argv[] )
 	DWORD lpExitCode;
 
 	// Setup the module name.
-	ZeroMemory( prModuleName, sizeof(prModuleName) );
-	if( !GetModuleFileName(NULL, prModuleName, MAX_PATH) ) {
-		fprintf( stderr, "GetModuleFileName failed (%d).\n", GetLastError() );
+	ZeroMemory(prModuleName, sizeof(prModuleName));
+	if (!GetModuleFileName(NULL, prModuleName, MAX_PATH)) {
+		fprintf(stderr, "GetModuleFileName failed (%d).\n", GetLastError());
 		return;
 	}
-	if( !PathRemoveFileSpec(prModuleName) ) {
-		fprintf( stderr, "PathRemoveFileSpec failed (%d).\n", GetLastError() );
+	if (!PathRemoveFileSpec(prModuleName)) {
+		fprintf(stderr, "PathRemoveFileSpec failed (%d).\n", GetLastError());
 		return;
 	}
-	StringCchCat( prModuleName, MAX_PATH, L"\\FAsm2.exe" );
+	StringCchCat(prModuleName, MAX_PATH, L"\\FAsm2.exe");
 	
 	// Parse the commandline.
-	ZeroMemory( prCommandLine, sizeof(prCommandLine) );
+	ZeroMemory(prCommandLine, sizeof(prCommandLine));
 	for (int i = 0; i < argc; i++) {
-		StringCchCat( prCommandLine, MAX_CMD, L"\"" );
-		StringCchCat( prCommandLine, MAX_CMD, argv[i] );
-		StringCchCat( prCommandLine, MAX_CMD, L"\" " );
+		StringCchCat(prCommandLine, MAX_CMD, L"\"");
+		StringCchCat(prCommandLine, MAX_CMD, argv[i]);
+		StringCchCat(prCommandLine, MAX_CMD, L"\" ");
 	}
-	StringCchCat( prCommandLine, MAX_CMD, L"-s \"PureBasic.fas\"" );
+	StringCchCat(prCommandLine, MAX_CMD, L"-s \"PureBasic.fas\"");
 
 	// Setup the child process.
-	ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
-	ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
+	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
 	siStartInfo.cb = sizeof(STARTUPINFO);
 
 	// Start the child process. 
-	if( !CreateProcess( prModuleName,   // Module name
+	if (!CreateProcess(prModuleName,   // Module name
 		prCommandLine,  // Command line
 		NULL,           // Process handle not inheritable
 		NULL,           // Thread handle not inheritable
@@ -54,29 +54,29 @@ void _tmain( int argc, TCHAR *argv[] )
 		NULL,           // Use parent's environment block
 		NULL,           // Use parent's starting directory 
 		&siStartInfo,   // Pointer to STARTUPINFO structure
-		&piProcInfo )   // Pointer to PROCESS_INFORMATION structure
+		&piProcInfo)    // Pointer to PROCESS_INFORMATION structure
 	) {
-		fprintf( stderr, "CreateProcess failed (%d).\n", GetLastError() );
+		fprintf(stderr, "CreateProcess failed (%d).\n", GetLastError());
 		return;
 	}
 
 	// Wait until child process exits.
-	WaitForSingleObject( piProcInfo.hProcess, INFINITE );
+	WaitForSingleObject(piProcInfo.hProcess, INFINITE);
 
 	// Get the exit code of child process.
-	if( !GetExitCodeProcess( piProcInfo.hProcess, &lpExitCode ) ) {
-		fprintf( stderr, "GetExitCodeProcess failed (%d).\n", GetLastError() );
+	if (!GetExitCodeProcess(piProcInfo.hProcess, &lpExitCode)) {
+		fprintf(stderr, "GetExitCodeProcess failed (%d).\n", GetLastError());
 		return;
 	}
 
 	// Close process and thread handles. 
-	CloseHandle( piProcInfo.hProcess );
-	CloseHandle( piProcInfo.hThread );
+	CloseHandle(piProcInfo.hProcess);
+	CloseHandle(piProcInfo.hThread);
 
 	// Copy other files.
-	CopyFile( L"PureBasic.asm", L"..\\PureBasic.asm", FALSE );
-	CopyFile( L"PureBasic.fas", L"..\\PureBasic.fas", FALSE );
-	CopyFile( L"PureBasic.obj", L"..\\PureBasic.obj", FALSE );
+	CopyFile(L"PureBasic.asm", L"..\\PureBasic.asm", FALSE);
+	CopyFile(L"PureBasic.fas", L"..\\PureBasic.fas", FALSE);
+	CopyFile(L"PureBasic.obj", L"..\\PureBasic.obj", FALSE);
 
 	// Exit this process.
 	ExitProcess(lpExitCode);
